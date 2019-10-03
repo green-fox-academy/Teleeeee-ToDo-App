@@ -37,13 +37,16 @@ int main(int argc, char* argv[]) {
              flagForCorrectArgument = 1;
              if(!std::isdigit(argv[2][0])) {
                  std::cout << "Unable to remove: index is not a number" << std::endl;
-                 if (argc > 2) {
+                }
+                if (argc == 2) {
+                    std::cout << "Unable to remove: no index provided" << std::endl;
+                }
+                if (argc == 3) {
                      cutOutListItem("my-text.txt", std::stoi(argv[2]));
-                 }
-                 if (argc == 2) {
-                     std::cout << "Unable to remove: no index provided" << std::endl;
-                 }
-             }
+                } else {
+                     std::cout << "Too many argument provided. Try format: -r 2" << std::endl;
+                }
+
          }
          if(argv[1] == std::string("-c")){
              flagForCorrectArgument = 1;
@@ -97,7 +100,7 @@ void cutOutListItem(std::string  fileName, int index){
         }
         myFileCopy.close();
     }catch(std::ofstream::failure& e){
-        std::cout << e.what() << std::endl;
+        //only getline would throw exeption here
     }
     if(counter < index){
         std::cout << "Unable to remove: index is out of bound" << std::endl;
@@ -136,7 +139,7 @@ void readListItem(std::string  fileName, std::vector<int> doneItems){
         }
         myFileOut.close();
     } catch (std::ifstream::failure &e) {
-        //could have catch here but only getline would throw something here
+        //only getline would throw exeption here
     }
     if(empty){
         std::cout << "No todos for today! :)" << std::endl;
@@ -163,7 +166,7 @@ void writeListOut(std::string  fileName, std::string input){
         }
         myFileCopy.close();
     }catch(std::ifstream::failure& e){
-        //getline trows exeptions when closes file
+        //only getline would throw exeption here
     }
 
     textToCutFrom.push_back(input);
@@ -216,7 +219,7 @@ void checkTask(std::string  fileName, int index){
         }
         myFileOut.close();
     } catch (std::ifstream::failure &e) {
-        //could have catch here but only getline would throw something here
+        //only getline would throw exeption here
     }
     if(empty){
         std::cout << "No todos for today! :)" << std::endl;
