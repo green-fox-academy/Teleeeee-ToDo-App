@@ -7,24 +7,37 @@ void cutOutListItem(std::string  fileName, int index);
 void readListItem(std::string  fileName);
 void writeListOut(std::string  fileName, std::string input);
 void printUsage();
-int numerateInput(std::string input);
-int getIndex(std::string input);
 
 int main(int argc, char* argv[]) {
-
-
-        switch (numerateInput(input)){
-            case(0):printUsage();
-                break;
-            case(1):readListItem("my-text.txt");
-                break;
-            case(2):writeListOut("my-text.txt",  input.erase(0, 3));
-                break;
-            case(3):cutOutListItem("my-text.txt", index);
-                break;
-            case(4):
-                break;
+    bool flagForCorrectArgument = 0;
+   if(argc == 1){
+        printUsage();
+    }
+    else{
+        if(argv[1] == std::string("-l")){
+            flagForCorrectArgument = 1;
+            readListItem("my-text.txt");
         }
+        if(argv[1] == std::string("-a")){
+            flagForCorrectArgument = 1;
+            if(argc > 2) {
+                writeListOut("my-text.txt", argv[2]);
+            }else{
+                std::cout << "Unable to add: no task provided" << std::endl;
+            }
+        }
+        if(argv[1] == std::string("-r")){
+            flagForCorrectArgument = 1;
+            cutOutListItem("my-text.txt", std::stoi(argv[2]));
+        }
+        if(argv[1] == std::string("-c")){
+            flagForCorrectArgument = 1;
+        }
+        if(!flagForCorrectArgument){
+            std::cout << "Unsupported argument" << std::endl;
+        }
+
+    }
 
     return 0;
 
@@ -90,19 +103,38 @@ void readListItem(std::string  fileName){
 
 void writeListOut(std::string  fileName, std::string input){
 
+    std::ifstream myFileCopy;
+    myFileCopy.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    std::vector<std::string> textToCutFrom;
+    try {
+        myFileCopy.open(fileName);
+        std::string textCopy;
+        while (!myFileCopy.eof()) {
+            for (int i = 1;; ++i) {
+                getline(myFileCopy, textCopy);
+                textToCutFrom.push_back(textCopy);
+                if (myFileCopy.eof()) {
+                    break;
+                }
+            }
+
+        }
+        myFileCopy.close();
+    }catch(std::ifstream::failure& e){
+        //getline trows exeptions when closes file
+    }
+
+    textToCutFrom.push_back(input);
+
     std::ofstream myFile;
-    myFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    myFile.exceptions(std::ofstream::failbit | std::ofstream::badbit);
     try {
         myFile.open(fileName);
-        if(input == "-a"){
-            std::cout << "Unable to add: no task provided" << std::endl;
-        }
-        else {
-            input.erase(0, 3);
-            myFile << input;
+        for(int i = 0 ; i < textToCutFrom.size() ; i++){
+            myFile << textToCutFrom[i] << std::endl;
         }
         myFile.close();
-    }catch(std::ifstream::failure& e){
+    }catch(std::ofstream::failure& e){
         std::cout << e.what() << std::endl;
     }
 }
@@ -115,24 +147,4 @@ void printUsage(){
     std::cout << "     -a   Adds a new task" << std::endl;
     std::cout << "     -r   Removes an task" << std::endl;
     std::cout << "     -c   Completes an task" << std::endl;
-}
-
-int numerateInput(std::string input){
-    input.erase(2, input.length()-2);
-    input.erase(0, 1);
-    std::string r = "r";
-    std::string l = "l";
-    std::string a = "a";
-    std::string c = "c";
-    if(input == l){return 1;}
-    if(input == a){return 2;}
-    if(input == r){return 3;}
-    if(input == c){return 4;}
-    return  0;
-}
-
-int getIndex(std::string input){
-    input.erase(0,3);
-    input.erase(1,input.length()-1);
-    return std::stoi(input);
 }
